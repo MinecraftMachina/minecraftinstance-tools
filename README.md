@@ -3,12 +3,7 @@
 
 ## Tools
 - [Addon remover](remover.py)
-  - Removes addons using fuzzy search
-  - Removes unused dependencies
+  - Search for addons
+  - Remove them
+  - Remove their dependencies if not used by other addons
   - Version-control-friendly modifications
-
-## Usage
-```bash
-poetry install
-poetry run python <tool>.py
-```
