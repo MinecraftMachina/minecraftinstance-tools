@@ -68,7 +68,7 @@ def stage_addon_with_deps(addon: InstalledAddon):
             print(f"Addon with id {dep_file.addon_id} referenced but not defined. Blame Twitch!")
 
 
-def search_addons(query: str):
+def choose_addons(query: str):
     filtered_addons = minecraft_instance.installed_addons
     if query != "":
         filtered_addons = [addon for addon in filtered_addons if
@@ -86,10 +86,10 @@ def search_addons(query: str):
     elif choice == "":
         return False
     else:
-        return search_addons(choice)
+        return choose_addons(choice)
 
 
-def choose_addons():
+def ask_unstage_addons():
     i = 0
     print("\nStaged for removal:")
     for addon in staged_addons:
@@ -103,7 +103,7 @@ def choose_addons():
     elif choice == "":
         return False
     else:
-        return choose_addons()
+        return ask_unstage_addons()
 
 
 if __name__ == '__main__':
@@ -120,11 +120,11 @@ if __name__ == '__main__':
         minecraft_instance = minecraft_instance_from_dict(minecraft_instance_json)
 
     while True:
-        if not search_addons(""):
+        if not choose_addons(""):
             break
 
     while len(staged_addons) > 0:
-        if not choose_addons():
+        if not ask_unstage_addons():
             break
 
     if len(staged_addons) < 1:
@@ -136,13 +136,14 @@ if __name__ == '__main__':
         print(f"Removed {addon.installed_file.file_name}")
 
     print("\nWould you like to save the changes? (y/N)")
-    if input("> ").lower() == "y":
-        while mc_instance_file_bak.exists():
-            mc_instance_file_bak = mc_instance_file_bak.with_suffix(mc_instance_file_bak.suffix + ".bak")
-        mc_instance_file.rename(mc_instance_file_bak)
-
-        with mc_instance_file.open("w", newline='\n') as f:
-            json.dump(minecraft_instance_json, f, sort_keys=False, indent=2)
-            print(f"Saved to: {f.name}")
-    else:
+    if input("> ").lower() != "y":
         print("Nothing changed")
+        exit(0)
+
+    while mc_instance_file_bak.exists():
+        mc_instance_file_bak = mc_instance_file_bak.with_suffix(mc_instance_file_bak.suffix + ".bak")
+    mc_instance_file.rename(mc_instance_file_bak)
+
+    with mc_instance_file.open("w", newline='\n') as f:
+        json.dump(minecraft_instance_json, f, sort_keys=False, indent=2)
+        print(f"Saved to: {f.name}")
