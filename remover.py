@@ -1,4 +1,5 @@
 import json
+import sys
 from pathlib import Path
 
 from structs import *
@@ -7,12 +8,8 @@ minecraft_instance: MinecraftInstance
 minecraft_instance_json: dict
 removed_addons: List[InstalledAddon] = []
 
-mc_instance_file = Path("minecraftinstance.json")
-mc_instance_file_bak = mc_instance_file.with_suffix(mc_instance_file.suffix + ".bak")
-
-with mc_instance_file.open() as f:
-    minecraft_instance_json = json.load(f)
-    minecraft_instance = minecraft_instance_from_dict(minecraft_instance_json)
+mc_instance_file: Path
+mc_instance_file_bak: Path
 
 
 def remove_addon(addon: InstalledAddon):
@@ -92,6 +89,18 @@ def search_addons(query: str):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print("Usage of this script:")
+        print("  remover.py /path/to/minecraftinstance.json")
+        exit(1)
+
+    mc_instance_file = Path(sys.argv[1])
+    mc_instance_file_bak = mc_instance_file.with_suffix(mc_instance_file.suffix + ".bak")
+
+    with mc_instance_file.open() as f:
+        minecraft_instance_json = json.load(f)
+        minecraft_instance = minecraft_instance_from_dict(minecraft_instance_json)
+
     while True:
         if not search_addons(""):
             break
