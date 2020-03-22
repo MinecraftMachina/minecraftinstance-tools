@@ -23,25 +23,45 @@ def remove_addon(addon: InstalledAddon):
     removed_addons.append(addon)
 
 
+class IdNotFoundException(Exception):
+    pass
+
+
 def get_addon_with_id(id: int) -> InstalledAddon:
-    return next(a for a in minecraft_instance.installed_addons if a.addon_id == id)
-
-
-def addon_referenced(addon: InstalledAddon) -> bool:
     try:
-        res = any(a for a in minecraft_instance.installed_addons if
-                  any(f for f in a.installed_file.dependencies if
-                      addon == get_addon_with_id(f.addon_id)))
-    except RuntimeError:
-        res = False
-    return res
+        return next(a for a in minecraft_instance.installed_addons if a.addon_id == id)
+    except StopIteration:
+        raise IdNotFoundException()
+
+
+def get_addon_references(addon: InstalledAddon):
+    for a in minecraft_instance.installed_addons:
+        if a == addon:
+            continue
+        for f in a.installed_file.dependencies:
+            # skip dependencies that are not actual dependencies
+            if f.type != 3:
+                continue
+            f_addon = get_addon_with_id(f.addon_id)
+            if addon == f_addon:
+                yield a
 
 
 def remove_addon_with_deps(addon: InstalledAddon):
+    referenced = False
+    for a in get_addon_references(addon):
+        print(f"Addon referenced by {a.installed_file.file_name}")
+        referenced = True
+    if referenced:
+        return
+
     remove_addon(addon)
+
     for dep_file in addon.installed_file.dependencies:
         dep_addon = get_addon_with_id(dep_file.addon_id)
-        if not addon_referenced(dep_addon):
+        try:
+            next(get_addon_references(dep_addon))
+        except StopIteration:
             remove_addon_with_deps(dep_addon)
 
 
