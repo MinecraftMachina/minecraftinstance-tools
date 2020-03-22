@@ -1,6 +1,9 @@
 # MinecraftInstance Tools
 > Tools for manipulating Twitch's minecraftinstance.json file
 
+## Motivation
+This project provides you with all the tools needed to manage Twitch's `minecraftinstance.json` quickly, efficiently, and in a version control (diff) friendly way.
+
 ## Tools
 - [Addon remover](remover.py)
   - Search for addons
