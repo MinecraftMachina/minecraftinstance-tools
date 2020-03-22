@@ -1,8 +1,6 @@
 import json
 from pathlib import Path
 
-import fuzzysearch
-
 from structs import *
 
 minecraft_instance: MinecraftInstance
@@ -51,7 +49,7 @@ def search_addons(query: str):
     filtered_addons = minecraft_instance.installed_addons
     if query != "":
         filtered_addons = [addon for addon in filtered_addons if
-                           len(fuzzysearch.find_near_matches(query, addon.installed_file.file_name, max_l_dist=1)) > 0]
+                           query.lower() in addon.installed_file.file_name.lower()]
     i = 0
     print("\nSearch results:")
     for addon in filtered_addons:
