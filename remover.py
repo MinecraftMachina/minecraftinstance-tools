@@ -118,6 +118,8 @@ def load_file():
 
 
 if __name__ == '__main__':
+    global mc_instance_file, mc_instance_file_bak, f, minecraft_instance_json, minecraft_instance
+
     if len(sys.argv) < 2:
         print("Usage of this script:")
         print("  remover.py /path/to/minecraftinstance.json")
