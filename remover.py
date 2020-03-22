@@ -6,18 +6,10 @@ from structs import *
 
 minecraft_instance: MinecraftInstance
 minecraft_instance_json: dict
-removed_addons: List[InstalledAddon] = []
+staged_addons: List[InstalledAddon] = []
 
 mc_instance_file: Path
 mc_instance_file_bak: Path
-
-
-def remove_addon(addon: InstalledAddon):
-    minecraft_instance.installed_addons.remove(addon)
-    addon_json = next(a for a in minecraft_instance_json["installedAddons"] if
-                      addon.installed_file.file_name == a["installedFile"]["fileName"])
-    minecraft_instance_json["installedAddons"].remove(addon_json)
-    removed_addons.append(addon)
 
 
 class IdNotFoundException(Exception):
@@ -31,9 +23,9 @@ def get_addon_with_id(id: int) -> InstalledAddon:
         raise IdNotFoundException()
 
 
-def get_addon_references(addon: InstalledAddon):
+def get_addon_references(addon: InstalledAddon, ignored_addon: InstalledAddon = None):
     for a in minecraft_instance.installed_addons:
-        if a == addon:
+        if a == ignored_addon:
             continue
         for f in a.installed_file.dependencies:
             # skip dependencies that are not actual dependencies
@@ -47,22 +39,31 @@ def get_addon_references(addon: InstalledAddon):
                 print(f"Addon with id {f.addon_id} referenced but not defined. Blame Twitch!")
 
 
-def remove_addon_with_deps(addon: InstalledAddon):
+def remove_addon(addon: InstalledAddon):
+    minecraft_instance.installed_addons.remove(addon)
+    addon_json = next(a for a in minecraft_instance_json["installedAddons"] if
+                      addon.installed_file.file_name == a["installedFile"]["fileName"])
+    minecraft_instance_json["installedAddons"].remove(addon_json)
+
+
+def stage_addon_with_deps(addon: InstalledAddon):
     referenced = False
     for a in get_addon_references(addon):
         print(f"Addon referenced by {a.installed_file.file_name}")
+        input("Press enter to continue...")
         referenced = True
     if referenced:
         return
 
-    remove_addon(addon)
+    staged_addons.append(addon)
 
     for dep_file in addon.installed_file.dependencies:
         try:
             dep_addon = get_addon_with_id(dep_file.addon_id)
-            next(get_addon_references(dep_addon))
-        except StopIteration:
-            remove_addon_with_deps(dep_addon)
+            try:
+                next(get_addon_references(dep_addon, addon))
+            except StopIteration:
+                staged_addons.append(dep_addon)
         except IdNotFoundException:
             print(f"Addon with id {dep_file.addon_id} referenced but not defined. Blame Twitch!")
 
@@ -80,12 +81,29 @@ def search_addons(query: str):
     print("\nEnter choice number, new search, or leave empty to stop:")
     choice = input("> ")
     if choice.isdigit():
-        remove_addon_with_deps(filtered_addons[int(choice)])
+        stage_addon_with_deps(filtered_addons[int(choice)])
         return True
     elif choice == "":
         return False
     else:
         return search_addons(choice)
+
+
+def choose_addons():
+    i = 0
+    print("\nStaged for removal:")
+    for addon in staged_addons:
+        print(f"{i:02}. {addon.installed_file.file_name}")
+        i += 1
+    print("\nEnter choice number to discard, or leave empty to stop:")
+    choice = input("> ")
+    if choice.isdigit():
+        remove_addon(staged_addons.pop(int(choice)))
+        return True
+    elif choice == "":
+        return False
+    else:
+        return choose_addons()
 
 
 if __name__ == '__main__':
@@ -105,8 +123,16 @@ if __name__ == '__main__':
         if not search_addons(""):
             break
 
-    print("\nRemoval results:")
-    for addon in removed_addons:
+    while len(staged_addons) > 0:
+        if not choose_addons():
+            break
+
+    if len(staged_addons) < 1:
+        print("Nothing changed")
+        exit(0)
+
+    print("\nRemoved:")
+    for addon in staged_addons:
         print(f"Removed {addon.installed_file.file_name}")
 
     print("\nWould you like to save the changes? (y/N)")
