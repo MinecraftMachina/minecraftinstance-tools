@@ -106,11 +106,8 @@ def ask_unstage_addons():
         return ask_unstage_addons()
 
 
-if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print("Usage of this script:")
-        print("  remover.py /path/to/minecraftinstance.json")
-        exit(1)
+def load_file():
+    global mc_instance_file, mc_instance_file_bak, f, minecraft_instance_json, minecraft_instance
 
     mc_instance_file = Path(sys.argv[1])
     mc_instance_file_bak = mc_instance_file.with_suffix(mc_instance_file.suffix + ".bak")
@@ -118,6 +115,15 @@ if __name__ == '__main__':
     with mc_instance_file.open() as f:
         minecraft_instance_json = json.load(f)
         minecraft_instance = minecraft_instance_from_dict(minecraft_instance_json)
+
+
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print("Usage of this script:")
+        print("  remover.py /path/to/minecraftinstance.json")
+        exit(1)
+
+    load_file()
 
     while True:
         if not choose_addons(""):
