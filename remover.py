@@ -76,7 +76,7 @@ def choose_addons(query: str):
     i = 0
     print("\nSearch results:")
     for addon in filtered_addons:
-        print(f"{i:02}. {addon.installed_file.file_name}")
+        print(f"{i:>3}. {addon.installed_file.file_name}")
         i += 1
     print("\nEnter choice number, new search, or leave empty to stop:")
     choice = input("> ")
@@ -93,7 +93,7 @@ def ask_unstage_addons():
     i = 0
     print("\nStaged for removal:")
     for addon in staged_addons:
-        print(f"{i:02}. {addon.installed_file.file_name}")
+        print(f"{i:>3}. {addon.installed_file.file_name}")
         i += 1
     print("\nEnter choice number to discard, or leave empty to stop:")
     choice = input("> ")
