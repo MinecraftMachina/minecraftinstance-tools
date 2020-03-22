@@ -42,9 +42,12 @@ def get_addon_references(addon: InstalledAddon):
             # skip dependencies that are not actual dependencies
             if f.type != 3:
                 continue
-            f_addon = get_addon_with_id(f.addon_id)
-            if addon == f_addon:
-                yield a
+            try:
+                f_addon = get_addon_with_id(f.addon_id)
+                if addon == f_addon:
+                    yield a
+            except IdNotFoundException:
+                print(f"Addon with id {f.addon_id} referenced but not defined. Blame Twitch!")
 
 
 def remove_addon_with_deps(addon: InstalledAddon):
@@ -58,11 +61,13 @@ def remove_addon_with_deps(addon: InstalledAddon):
     remove_addon(addon)
 
     for dep_file in addon.installed_file.dependencies:
-        dep_addon = get_addon_with_id(dep_file.addon_id)
         try:
+            dep_addon = get_addon_with_id(dep_file.addon_id)
             next(get_addon_references(dep_addon))
         except StopIteration:
             remove_addon_with_deps(dep_addon)
+        except IdNotFoundException:
+            print(f"Addon with id {dep_file.addon_id} referenced but not defined. Blame Twitch!")
 
 
 def search_addons(query: str):
