@@ -107,7 +107,7 @@ def ask_unstage_addons():
 
 
 def load_file():
-    global mc_instance_file, mc_instance_file_bak, f, minecraft_instance_json, minecraft_instance
+    global mc_instance_file, mc_instance_file_bak, minecraft_instance_json, minecraft_instance
 
     mc_instance_file = Path(sys.argv[1])
     mc_instance_file_bak = mc_instance_file.with_suffix(mc_instance_file.suffix + ".bak")
@@ -118,7 +118,7 @@ def load_file():
 
 
 if __name__ == '__main__':
-    global mc_instance_file, mc_instance_file_bak, f, minecraft_instance_json, minecraft_instance
+    global mc_instance_file, mc_instance_file_bak, minecraft_instance_json, minecraft_instance
 
     if len(sys.argv) < 2:
         print("Usage of this script:")
