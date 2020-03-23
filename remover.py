@@ -90,7 +90,7 @@ class Remover(object):
         for addon in self.staged_addons:
             print(f"{i:>3}. {addon.installed_file.file_name}")
             i += 1
-        print("\nEnter choice number to discard, or leave empty to stop:")
+        print("\nEnter choice number to discard, or leave empty to finish:")
         choice = input("> ")
         if choice.isdigit():
             self.remove_addon(self.staged_addons.pop(int(choice)))
