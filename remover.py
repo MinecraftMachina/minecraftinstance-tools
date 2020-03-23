@@ -125,6 +125,7 @@ class Remover(object):
 
         print("\nRemoved:")
         for addon in self.staged_addons:
+            self.remove_addon(addon)
             print(f"Removed {addon.installed_file.file_name}")
 
         print("\nWould you like to save the changes? (y/N)")
