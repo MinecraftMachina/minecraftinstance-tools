@@ -47,8 +47,9 @@ class Remover(object):
         referenced = False
         for a in self.get_addon_references(addon):
             print(f"Addon referenced by {a.installed_file.file_name}")
-            input("Press enter to continue...")
             referenced = True
+        print("Remove those dependencies first")
+        input("Press enter to continue...")
         if referenced:
             return
 
@@ -123,7 +124,7 @@ class Remover(object):
             print("Nothing changed")
             exit(0)
 
-        print("\nRemoved:")
+        print("\nRemoved addons:")
         for addon in self.staged_addons:
             self.remove_addon(addon)
             print(f"Removed {addon.installed_file.file_name}")
