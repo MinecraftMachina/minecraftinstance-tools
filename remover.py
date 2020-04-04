@@ -73,7 +73,9 @@ class Remover(object):
         i = 0
         print("\nSearch results:")
         for addon in filtered_addons:
-            print(f"{i:>3}. {addon.installed_file.file_name}")
+            staged = next((a for a in self.staged_addons if a == addon), None)
+            staged = "" if staged == None else "[STAGED] "
+            print(f"{i:>3}. {staged}{addon.installed_file.file_name}")
             i += 1
         print("\nEnter choice number, new search, or leave empty to stop:")
         choice = input("> ")
