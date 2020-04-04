@@ -96,7 +96,7 @@ class Remover(object):
         print("\nEnter choice number to discard, or leave empty to save changes:")
         choice = input("> ")
         if choice.isdigit():
-            self.remove_addon(self.staged_addons.pop(int(choice)))
+            self.staged_addons.pop(int(choice))
             return True
         elif choice == "":
             return False
