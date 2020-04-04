@@ -48,9 +48,9 @@ class Remover(object):
         for a in self.get_addon_references(addon):
             print(f"Addon referenced by {a.installed_file.file_name}")
             referenced = True
-        print("Remove those dependencies first")
-        input("Press enter to continue...")
         if referenced:
+            print("Remove those dependencies first")
+            input("Press enter to continue...")
             return
 
         self.staged_addons.append(addon)
