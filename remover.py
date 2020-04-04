@@ -93,7 +93,7 @@ class Remover(object):
         for addon in self.staged_addons:
             print(f"{i:>3}. {addon.installed_file.file_name}")
             i += 1
-        print("\nEnter choice number to discard, or leave empty to finish:")
+        print("\nEnter choice number to discard, or leave empty to save changes:")
         choice = input("> ")
         if choice.isdigit():
             self.remove_addon(self.staged_addons.pop(int(choice)))
@@ -126,15 +126,9 @@ class Remover(object):
             print("Nothing changed")
             exit(0)
 
-        print("\nRemoved addons:")
         for addon in self.staged_addons:
             self.remove_addon(addon)
             print(f"Removed {addon.installed_file.file_name}")
-
-        print("\nWould you like to save the changes? (y/N)")
-        if input("> ").lower() != "y":
-            print("Nothing changed")
-            exit(0)
 
         while self.mc_instance_file_bak.exists():
             self.mc_instance_file_bak = self.mc_instance_file_bak.with_suffix(self.mc_instance_file_bak.suffix + ".bak")
